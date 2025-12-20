@@ -5,7 +5,7 @@ from .config import settings
 
 
 DATABASE_URL = URL.create(
-    drivername='postgresql+psycopg2',
+    drivername="postgresql+psycopg2",
     host=settings.db_host,
     port=settings.db_port,
     username=settings.db_user,

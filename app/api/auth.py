@@ -10,42 +10,46 @@ from ..schemas.user import UserRegister, UserResponse
 from ..models.user import User
 from ..core.security import hash_password, create_token, verify_password
 
-router = APIRouter(prefix='/auth')
+router = APIRouter(prefix="/auth")
 
 security = HTTPBasic()
 
-@router.post('/register', response_model=UserResponse)
+
+@router.post("/register", response_model=UserResponse)
 def register(
-    user_data: Annotated[UserRegister, Body()],
-    db: Annotated[Session, Depends(get_db)]
+    user_data: Annotated[UserRegister, Body()], db: Annotated[Session, Depends(get_db)]
 ):
     existing_user = db.query(User).filter(User.username == user_data.username).first()
     if existing_user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already exists.')
-    
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists."
+        )
+
     new_user = User(
-        username=user_data.username,
-        password=hash_password(user_data.password)
+        username=user_data.username, password=hash_password(user_data.password)
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
+
     return new_user
 
-@router.post('/login')
+
+@router.post("/login")
 def login(
     credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-    db: Annotated[Session, Depends(get_db)]
+    db: Annotated[Session, Depends(get_db)],
 ):
     user = db.query(User).filter(User.username == credentials.username).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found.')
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found."
+        )
 
     if not verify_password(credentials.password, user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid Password.')
-    
-    return {
-        'token': create_token(user.user_id)
-    }
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Password."
+        )
+
+    return {"token": create_token(user.user_id)}

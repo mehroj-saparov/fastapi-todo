@@ -18,10 +18,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def create_token(user_id: str) -> Dict[str, str]:
-    payload = {
-        "user_id": user_id,
-        "expires": time() + 900
-    }
+    payload = {"user_id": user_id, "expires": time() + 900}
     token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
     return token
@@ -29,7 +26,9 @@ def create_token(user_id: str) -> Dict[str, str]:
 
 def verify_token(token: str) -> dict:
     try:
-        decoded_token = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+        decoded_token = jwt.decode(
+            token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+        )
         return decoded_token if decoded_token["expires"] >= time.time() else None
     except:
         return {}

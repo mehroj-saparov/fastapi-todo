@@ -10,10 +10,10 @@ class UserRegister(BaseModel):
     password: Annotated[str, Field(min_length=8, max_length=20)]
     confirm: Annotated[str, Field(min_length=8, max_length=20)]
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_passwords_match(self) -> Self:
         if self.password != self.confirm:
-            raise ValueError('Passwords do not match')
+            raise ValueError("Passwords do not match")
         return self
 
 
